@@ -1,0 +1,43 @@
+gz_to_agiros_image_bridge:
+  ros__parameters:
+    # Gazebo topics
+    gz_rgb_topic: "/rgb"
+    agiros_rgb_topic: "/camera/image_raw"
+    gz_depth_topic: "/depth"
+    agiros_depth_topic: "/drone_0_/camera/depth/image_raw"
+    odom_topic: "/drone_0_/Odometry"
+    
+    # Camera intrinsics (calculated from FOV=1.4 rad, width=640, height=480)
+    camera_fx: 506.3
+    camera_fy: 506.3
+    camera_cx: 320.0
+    camera_cy: 240.0
+    
+    # Camera extrinsics (from model.sdf)
+    # Temporarily disabled to diagnose the issue
+    camera_offset_x: 0.0
+    camera_offset_y: 0.0
+    camera_offset_z: 0.0
+    
+    # Camera rotation relative to body (no rotation in this setup)
+    camera_roll: 0.0
+    camera_pitch: 0.0
+    camera_yaw: 0.0
+    
+    target_frame: "world"
+    use_optical_frame_conversion: true  # Try disabling optical frame conversion
+    
+    # Voxel grid parameters
+    voxel_size: 0.05
+    confirm_threshold: 2
+    missing_frame_threshold: 10
+    decay_per_missing_frame: 1
+    publish_rate: 5.0
+    
+    # Ground/sky filtering
+    enable_ground_sky_filter: true
+    ground_max_z: 0.2
+    sky_min_z: 50.0
+    use_relative_ground_filter: true  # 相对于无人机高度过滤，更适合移动平台
+    ground_max_rel: 0.3               # 无人机下方0.3m内的点被视为地面
+    sky_min_rel: 50.0
