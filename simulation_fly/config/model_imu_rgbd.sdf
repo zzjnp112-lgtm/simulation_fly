@@ -202,8 +202,7 @@
           </cylinder>
         </geometry>
       </collision>
-
-     <!-- 修改雷达传感器配置 -->
+ <!-- 修改雷达传感器配置 -->
   <sensor name='lidar' type='gpu_lidar'>
     <pose>0 0 0 0 0 3.14159</pose>
     <update_rate>120</update_rate>  <!-- 降低频率以减轻处理负担 -->
@@ -243,7 +242,8 @@
 
     <!-- 将雷达连接到x500的主体上 -->
     <joint name="lidar_joint" type="fixed">
-      <parent>base_link</parent>
+      <parent>base_link</parent
+    >
       <child>lidar_sensor_link</child>
     </joint>
 

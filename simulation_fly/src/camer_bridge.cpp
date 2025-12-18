@@ -30,7 +30,8 @@ public:
         this->declare_parameter<std::string>("agiros_depth_topic", "/drone_0_/camera/depth/image_raw");
         this->declare_parameter<std::string>("rgb_frame_id", "camera_link");
         this->declare_parameter<std::string>("depth_frame_id", "camera_link");
-        this->declare_parameter<std::string>("imu_topic", "/imu/data");
+        this->declare_parameter<std::string>("rgbd_imu_topic", "rgbd/imu/data");
+        this->declare_parameter<std::string>("lidar_imu_topic", "lidar/imu/data");
         this->declare_parameter<std::string>("imu_frame_id", "camera_link");
         this->declare_parameter<std::string>("gz_lidar_scan_topic", "/lidar");
         this->declare_parameter<std::string>("agiros_lidar_scan_topic", "/drone_0_/lidar/scan");
@@ -44,8 +45,9 @@ public:
         ros_depth_topic_ = this->get_parameter("agiros_depth_topic").as_string();
         rgb_frame_id_ = this->get_parameter("rgb_frame_id").as_string();
         depth_frame_id_ = this->get_parameter("depth_frame_id").as_string();
-        imu_topic_ = this->get_parameter("imu_topic").as_string();
-        imu_frame_id_ = this->get_parameter("imu_frame_id").as_string();
+        rgbd_imu_topic_ = this->get_parameter("rgbd_imu_topic").as_string();
+        lidar_imu_topic_ = this->get_parameter("lidar_imu_topic").as_string();
+
         gz_lidar_scan_topic_ = this->get_parameter("gz_lidar_scan_topic").as_string();
         ros_lidar_scan_topic_ = this->get_parameter("agiros_lidar_scan_topic").as_string();
         gz_lidar_points_topic_ = this->get_parameter("gz_lidar_points_topic").as_string();
@@ -55,7 +57,8 @@ public:
         // ---------------- 发布器 ----------------
         rgb_pub_ = this->create_publisher<sensor_msgs::msg::Image>(ros_rgb_topic_, 100);
         depth_pub_ = this->create_publisher<sensor_msgs::msg::Image>(ros_depth_topic_, 100);
-        imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(imu_topic_, 100);
+        rgbd_imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(rgbd_imu_topic_, 100);
+        lidar_imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(lidar_imu_topic_, 100);
         lidar_scan_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(ros_lidar_scan_topic_, 100);
         lidar_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(ros_lidar_points_topic_, 100);
         clock_pub_ = this->create_publisher<rosgraph_msgs::msg::Clock>("/clock", 10);
@@ -90,10 +93,15 @@ public:
             RCLCPP_INFO(this->get_logger(), "成功订阅 Depth: %s", gz_depth_topic_.c_str());
 
         // IMU
-        if (!gz_node_.Subscribe("/imu", &GzToRos2Bridge::gzImuCallback, this))
-            RCLCPP_ERROR(this->get_logger(), "订阅 Gazebo IMU 失败: /imu");
+        if (!gz_node_.Subscribe("/sensor_imu", &GzToRos2Bridge::gzrgbdImuCallback, this))
+            RCLCPP_ERROR(this->get_logger(), "订阅 Gazebo IMU 失败: /sensor_imu");
         else
-            RCLCPP_INFO(this->get_logger(), "成功订阅 Gazebo IMU: /imu");
+            RCLCPP_INFO(this->get_logger(), "成功订阅 Gazebo IMU: /sensor_imu");
+
+        if (!gz_node_.Subscribe("/lidar_imu", &GzToRos2Bridge::gzLidarImuCallback, this))
+            RCLCPP_ERROR(this->get_logger(), "订阅 Gazebo Lidar IMU 失败: /lidar_imu");
+        else
+            RCLCPP_INFO(this->get_logger(), "成功订阅 Gazebo Lidar IMU: /lidar_imu");
 
         // 激光雷达扫描数据
         if (!gz_node_.Subscribe(gz_lidar_scan_topic_, &GzToRos2Bridge::lidarScanCallback, this))
@@ -110,7 +118,8 @@ public:
         RCLCPP_INFO(this->get_logger(), "Gazebo → ROS2 桥启动");
         RCLCPP_INFO(this->get_logger(), "RGB 发布到: %s", ros_rgb_topic_.c_str());
         RCLCPP_INFO(this->get_logger(), "Depth 发布到: %s", ros_depth_topic_.c_str());
-        RCLCPP_INFO(this->get_logger(), "IMU 发布到: %s", imu_topic_.c_str());
+        RCLCPP_INFO(this->get_logger(), "IMU 发布到: %s", rgbd_imu_topic_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Lidar IMU 发布到: %s", lidar_imu_topic_.c_str());
         RCLCPP_INFO(this->get_logger(), "Lidar Scan 发布到: %s", ros_lidar_scan_topic_.c_str());
         RCLCPP_INFO(this->get_logger(), "Lidar Points 发布到: %s", ros_lidar_points_topic_.c_str());
 
@@ -177,7 +186,7 @@ private:
     }
 
     // ---------------- Gazebo IMU 回调 ----------------
-    void gzImuCallback(const gz::msgs::IMU &gz_msg)
+    void gzrgbdImuCallback(const gz::msgs::IMU &gz_msg)
     {
         sensor_msgs::msg::Imu ros_msg;
 
@@ -185,7 +194,7 @@ private:
         auto s = gz_msg.header().stamp();
         ros_msg.header.stamp.sec = s.sec();
         ros_msg.header.stamp.nanosec = s.nsec();
-        ros_msg.header.frame_id = imu_frame_id_;
+        ros_msg.header.frame_id = rgb_frame_id_;
 
         // 线加速度
         ros_msg.linear_acceleration.x = gz_msg.linear_acceleration().x();
@@ -210,7 +219,43 @@ private:
             ros_msg.linear_acceleration_covariance[i] = 0.0;
         }
 
-        imu_pub_->publish(ros_msg);
+        rgbd_imu_pub_->publish(ros_msg);
+    }
+
+   void gzLidarImuCallback(const gz::msgs::IMU &gz_msg)
+    {
+        sensor_msgs::msg::Imu ros_msg;
+
+        // 时间戳
+        auto s = gz_msg.header().stamp();
+        ros_msg.header.stamp.sec = s.sec();
+        ros_msg.header.stamp.nanosec = s.nsec();
+        ros_msg.header.frame_id = rgb_frame_id_;
+
+        // 线加速度
+        ros_msg.linear_acceleration.x = gz_msg.linear_acceleration().x();
+        ros_msg.linear_acceleration.y = gz_msg.linear_acceleration().y();
+        ros_msg.linear_acceleration.z = gz_msg.linear_acceleration().z();
+
+        // 角速度
+        ros_msg.angular_velocity.x = gz_msg.angular_velocity().x();
+        ros_msg.angular_velocity.y = gz_msg.angular_velocity().y();
+        ros_msg.angular_velocity.z = gz_msg.angular_velocity().z();
+
+        // 四元数
+        ros_msg.orientation.x = gz_msg.orientation().x();
+        ros_msg.orientation.y = gz_msg.orientation().y();
+        ros_msg.orientation.z = gz_msg.orientation().z();
+        ros_msg.orientation.w = gz_msg.orientation().w();
+
+        // 协方差置0
+        for (int i=0; i<9; ++i) {
+            ros_msg.orientation_covariance[i] = 0.0;
+            ros_msg.angular_velocity_covariance[i] = 0.0;
+            ros_msg.linear_acceleration_covariance[i] = 0.0;
+        }
+
+        lidar_imu_pub_->publish(ros_msg);
     }
 
     // ---------------- 激光雷达扫描数据回调 ----------------
@@ -363,8 +408,8 @@ private:
     
     // 图像和IMU发布器
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr rgb_pub_, depth_pub_;
-    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub_;
-    
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr rgbd_imu_pub_;
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr lidar_imu_pub_;
     // 雷达发布器
     rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr lidar_scan_pub_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr lidar_points_pub_;
@@ -375,7 +420,8 @@ private:
     std::string gz_rgb_topic_, ros_rgb_topic_;
     std::string gz_depth_topic_, ros_depth_topic_;
     std::string rgb_frame_id_, depth_frame_id_;
-    std::string imu_topic_, imu_frame_id_;
+    std::string rgbd_imu_topic_, rgbd_imu_frame_id_;
+    std::string lidar_imu_topic_, lidar_imu_frame_id_;
     std::string gz_lidar_scan_topic_, ros_lidar_scan_topic_;
     std::string gz_lidar_points_topic_, ros_lidar_points_topic_;
     std::string lidar_frame_id_;
