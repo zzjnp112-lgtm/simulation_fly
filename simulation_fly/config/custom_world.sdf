@@ -1,0 +1,1568 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="custom_world">
+    
+    <!-- ========== PX4 必需配置：球面坐标系 ========== -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.397742</latitude_deg>
+      <longitude_deg>8.545594</longitude_deg>
+      <elevation>488.0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- ========== 环境设置 ========== -->
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    
+    <!-- ========== PX4 必需插件 ========== -->
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+    <plugin
+      filename="gz-sim-magnetometer-system"
+      name="gz::sim::systems::Magnetometer">
+    </plugin>
+    <plugin
+      filename="gz-sim-air-pressure-system"
+      name="gz::sim::systems::AirPressure">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-navsat-system"
+      name="gz::sim::systems::NavSat">
+    </plugin>
+    
+    <!-- 物理引擎设置 -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    
+    <!-- 添加地面 -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.7 0.7 0.7 1</ambient>
+            <diffuse>0.7 0.7 0.7 1</diffuse>
+            <specular>0 0 0 0</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 添加方向光 -->
+    <light name="sun" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <direction>-0.5 0.5 -1</direction>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>true</cast_shadows>
+    </light>
+    
+    <!-- ========== 视觉SLAM特征点 ========== -->
+<model name="extended_checkerboard1">
+      <pose>8 0 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="board">
+          <geometry>
+            <box>
+              <size>3 3 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>0.9 0.9 0.9 1</diffuse>
+          </material>
+        </visual>
+        <!-- 棋盘格图案 -->
+        <visual name="checker_n1">
+          <pose>0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n2">
+          <pose>-0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n3">
+          <pose>0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n4">
+          <pose>-0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+<model name="extended_checkerboard2">
+      <pose>8 5 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="board">
+          <geometry>
+            <box>
+              <size>3 3 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>0.9 0.9 0.9 1</diffuse>
+          </material>
+        </visual>
+        <!-- 棋盘格图案 -->
+        <visual name="checker_n1">
+          <pose>0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n2">
+          <pose>-0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n3">
+          <pose>0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n4">
+          <pose>-0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_checkerboard3">
+      <pose>5 3 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="board">
+          <geometry>
+            <box>
+              <size>3 3 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>0.9 0.9 0.9 1</diffuse>
+          </material>
+        </visual>
+        <!-- 棋盘格图案 -->
+        <visual name="checker_n1">
+          <pose>0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n2">
+          <pose>-0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n3">
+          <pose>0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n4">
+          <pose>-0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+<model name="extended_checkerboard5">
+      <pose>8 -2 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="board">
+          <geometry>
+            <box>
+              <size>3 3 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>0.9 0.9 0.9 1</diffuse>
+          </material>
+        </visual>
+        <!-- 棋盘格图案 -->
+        <visual name="checker_n1">
+          <pose>0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n2">
+          <pose>-0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n3">
+          <pose>0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n4">
+          <pose>-0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+
+    <!-- 棋盘格地面标记1（黑白棋盘） -->
+    <model name="checkerboard_1">
+      <pose>3 0 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 2 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.7 0.7 0.7 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+        
+        <!-- 添加棋盘纹理通过多个小方块实现 -->
+        <visual name="checker_1">
+          <pose>0.5 0.5 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_2">
+          <pose>-0.5 0.5 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_3">
+          <pose>0.5 -0.5 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_4">
+          <pose>-0.5 -0.5 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域：更多特征物体 -->
+
+    <!-- 扩展区域1：西北区域 (-10到0, 0到10) -->
+    <model name="extended_wall_nw1">
+      <pose>-5 5 1 0 0 0.785</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.6 0.4 0.2 1</ambient>
+            <diffuse>0.6 0.4 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_pyramid_nw">
+      <pose>-3 7 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cone>
+              <radius>0.6</radius>
+              <length>1.2</length>
+            </cone>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cone>
+              <radius>0.6</radius>
+              <length>1.2</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>0.3 0.7 0.3 1</ambient>
+            <diffuse>0.3 0.7 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域2：东北区域 (10到20, 0到10) -->
+    <model name="extended_building_ne">
+      <pose>15 5 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 2 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 2 3</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.8 0.6 0.4 1</ambient>
+            <diffuse>0.8 0.6 0.4 1</diffuse>
+          </material>
+        </visual>
+        <!-- 窗户细节 -->
+        <visual name="window_ne1">
+          <pose>0 1.01 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.02 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.3 0.6 1</ambient>
+            <diffuse>0.1 0.3 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_cylinder_array_ne">
+      <pose>8 3 0 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="cyl1">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.9 0.1 0.1 1</ambient>
+            <diffuse>0.9 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <visual name="cyl2">
+          <pose>1 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.9 0.1 1</ambient>
+            <diffuse>0.1 0.9 0.1 1</diffuse>
+          </material>
+        </visual>
+        <visual name="cyl3">
+          <pose>0.5 0.8 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.9 1</ambient>
+            <diffuse>0.1 0.1 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域3：西南区域 (-10到0, -10到0) -->
+    <model name="extended_maze_sw">
+      <pose>-5 -5 0.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <!-- L形墙1 -->
+        <visual name="maze_wall1">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>3 0.1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.3 0.1 1</ambient>
+            <diffuse>0.5 0.3 0.1 1</diffuse>
+          </material>
+        </visual>
+        <visual name="maze_wall2">
+          <pose>1.5 1.5 0.5 1.57 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 0.1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.3 0.1 1</ambient>
+            <diffuse>0.5 0.3 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_sphere_cluster_sw">
+      <pose>-7 -7 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="sphere1">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.4</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.8 0.2 0.8 1</ambient>
+            <diffuse>0.8 0.2 0.8 1</diffuse>
+          </material>
+        </visual>
+        <visual name="sphere2">
+          <pose>1 0.5 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.3</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.2 0.8 0.8 1</ambient>
+            <diffuse>0.2 0.8 0.8 1</diffuse>
+          </material>
+        </visual>
+        <visual name="sphere3">
+          <pose>-0.5 1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.35</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.2 1</ambient>
+            <diffuse>0.8 0.8 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域4：东南区域 (10到20, -10到0) -->
+    <model name="extended_tower_se">
+      <pose>15 -5 2 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.8</radius>
+              <length>4</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.8</radius>
+              <length>4</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.7 0.5 0.3 1</ambient>
+            <diffuse>0.7 0.5 0.3 1</diffuse>
+          </material>
+        </visual>
+        <!-- 塔顶 -->
+        <visual name="tower_top">
+          <pose>0 0 2.5 0 0 0</pose>
+          <geometry>
+            <cone>
+              <radius>1</radius>
+              <length>1</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>0.9 0.1 0.1 1</ambient>
+            <diffuse>0.9 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域5：远北区域 (0到20, 10到20) -->
+    <model name="extended_checkerboard_north">
+      <pose>10 15 0.02 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="board">
+          <geometry>
+            <box>
+              <size>3 3 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>0.9 0.9 0.9 1</diffuse>
+          </material>
+        </visual>
+        <!-- 棋盘格图案 -->
+        <visual name="checker_n1">
+          <pose>0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n2">
+          <pose>-0.75 0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n3">
+          <pose>0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="checker_n4">
+          <pose>-0.75 -0.75 0.021 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 0 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展区域6：远东区域 (20到30, -10到10) -->
+    <model name="extended_wall_east1">
+      <pose>25 0 1.5 0 0 1.57</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>5 0.2 3</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>5 0.2 3</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.5 0.7 1</ambient>
+            <diffuse>0.3 0.5 0.7 1</diffuse>
+          </material>
+        </visual>
+        <!-- 纹理细节 -->
+        <visual name="wall_detail1">
+          <pose>0 0.11 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.8 0.22 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.7 0.9 1</ambient>
+            <diffuse>0.5 0.7 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_arch_east">
+      <pose>22 -3 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <!-- 左柱 -->
+        <visual name="left_column">
+          <pose>-0.8 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.3 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.6 0.4 0.2 1</ambient>
+            <diffuse>0.6 0.4 0.2 1</diffuse>
+          </material>
+        </visual>
+        <!-- 右柱 -->
+        <visual name="right_column">
+          <pose>0.8 0 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.3 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.6 0.4 0.2 1</ambient>
+            <diffuse>0.6 0.4 0.2 1</diffuse>
+          </material>
+        </visual>
+        <!-- 横梁 -->
+        <visual name="beam">
+          <pose>0 0 2.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2 0.3 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.7 0.5 0.3 1</ambient>
+            <diffuse>0.7 0.5 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 扩展障碍物：更多细杆 -->
+    <model name="extended_pole_9">
+      <pose>-2 8 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.9 0.5 0 1</ambient>
+            <diffuse>0.9 0.5 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_pole_10">
+      <pose>18 8 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 0.5 0.9 1</ambient>
+            <diffuse>0 0.5 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="extended_pole_11">
+      <pose>18 -8 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0 0.9 1</ambient>
+            <diffuse>0.5 0 0.9 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 保留原有的所有物体 -->
+    <!-- 纹理丰富的墙面1 -->
+    <model name="feature_wall_1">
+      <pose>2 3 1 0 0 1.57</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>4 0.1 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>4 0.1 2</size>
+            </box>
+          </geometry>
+          <!-- 通过多个彩色方块创建纹理 -->
+          <material>
+            <ambient>0.8 0.6 0.4 1</ambient>
+            <diffuse>0.8 0.6 0.4 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+
+        
+        <!-- 添加纹理细节 -->
+        <visual name="texture_detail_1">
+          <pose>0.5 0 0.3 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.11 0.3</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.6 0.4 0.2 1</ambient>
+            <diffuse>0.6 0.4 0.2 1</diffuse>
+          </material>
+        </visual>
+
+        <visual name="texture_detail_2">
+          <pose>-0.5 0 -0.3 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.11 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.7 0.5 1</ambient>
+            <diffuse>0.9 0.7 0.5 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 纹理丰富的墙面2 -->
+    <model name="feature_wall_2">
+      <pose>6 -2 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.4 0.6 0.8 1</ambient>
+            <diffuse>0.4 0.6 0.8 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+     <model name="feature_wall_11">
+      <pose>6 4 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.4 0.6 0.8 1</ambient>
+            <diffuse>0.4 0.6 0.8 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 纹理丰富的墙面3 -->
+    <model name="feature_wall_3">
+      <pose>12 -2 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>3 0.1 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.4 0.6 0.8 1</ambient>
+            <diffuse>0.4 0.6 0.8 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 角点丰富的立方体1 -->
+    <model name="feature_cube_1">
+      <pose>1 -2 0.5 0 0 0.785</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.9 0.2 0.2 1</ambient>
+            <diffuse>0.9 0.2 0.2 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 角点丰富的立方体2 -->
+    <model name="feature_cube_2">
+      <pose>7 3 0.5 0 0.785 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.9 0.2 1</ambient>
+            <diffuse>0.2 0.9 0.2 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="feature_cube_3">
+      <pose>7 0 0.5 0 0.785 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.9 0.2 1</ambient>
+            <diffuse>0.2 0.9 0.2 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 金字塔形状特征 -->
+    <model name="feature_pyramid">
+      <pose>4 -1 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cone>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cone>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cone>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.2 1</ambient>
+            <diffuse>0.8 0.8 0.2 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="feature_pyramid1">
+      <pose>12 -0 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cone>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cone>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cone>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.2 1</ambient>
+            <diffuse>0.8 0.8 0.2 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 圆柱体特征 -->
+    <model name="feature_cylinder_1">
+      <pose>-1 2 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.9 1</ambient>
+            <diffuse>0.2 0.2 0.9 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 球体特征 -->
+    <model name="feature_sphere_1">
+      <pose>5 5 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.9 0.2 0.9 1</ambient>
+            <diffuse>0.9 0.2 0.9 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 纹理丰富的建筑物模拟 -->
+    <model name="feature_building">
+      <pose>8 -3 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 2 2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 2 2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.7 0.5 0.3 1</ambient>
+            <diffuse>0.7 0.5 0.3 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+
+        
+        <!-- 添加窗户细节 -->
+        <visual name="window_1">
+          <pose>0 1.01 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.02 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.3 1</ambient>
+            <diffuse>0.1 0.1 0.3 1</diffuse>
+          </material>
+        </visual>
+        <visual name="window_2">
+          <pose>0 1.01 -0.5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.4 0.02 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.3 1</ambient>
+            <diffuse>0.1 0.1 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 额外特征：彩色立方体阵列 -->
+    <model name="color_cube_array_1">
+      <pose>-2 -2 0.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <visual name="cube_red">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.3 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="cube_green">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.3 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>
+            <diffuse>0 1 0 1</diffuse>
+          </material>
+        </visual>
+        <visual name="cube_blue">
+          <pose>0 0.5 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.3 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 保留原有的所有细杆障碍物 -->
+ 
+    <!-- 其他原有细杆pole_2到pole_8保持不变 -->
+    <model name="pole_2">
+      <pose>8.5 6 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_3">
+      <pose>6 6 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>
+            <diffuse>0 1 0 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_4">
+      <pose>2 1 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1 1 0 1</ambient>
+            <diffuse>1 1 0 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_5">
+      <pose>0 -1 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1 0 1 1</ambient>
+            <diffuse>1 0 1 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_6">
+      <pose>0 1.5 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 1 1 1</ambient>
+            <diffuse>0 1 1 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_7">
+      <pose>5 -3 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.8 0.4 0 1</ambient>
+            <diffuse>0.8 0.4 0 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pole_8">
+      <pose>3 4 1.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.12</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+            <specular>0.3 0.3 0.3 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+  </world>
+</sdf>

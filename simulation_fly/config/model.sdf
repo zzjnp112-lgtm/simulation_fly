@@ -1,0 +1,251 @@
+<sdf version="1.9">
+  <model name="x500_depth">
+
+    <!-- 首先包含原始模型 -->
+    <include merge="true">
+      <uri>file:///home/duke/PX4-Autopilot/Tools/simulation/gz/models/x500_base/model.sdf</uri>
+    </include>
+
+    <!-- 添加相机链接 -->
+    <link name="camera_link">
+      <pose>0.2 0 0.3 0 0 0</pose>  <!-- 使用绝对位置，不指定relative_to -->
+      
+      <inertial>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <iyy>0.00001</iyy>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="camera_visual">
+        <geometry>
+          <box>
+            <size>0.02 0.09 0.03</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.2 0.2 0.2 1</ambient>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
+        </material>
+      </visual>
+
+      <collision name="camera_collision">
+        <geometry>
+          <box>
+            <size>0.02 0.09 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- RGBD相机传感器 -->
+      <sensor name="rgbd_camera" type="rgbd_camera">
+        <always_on>true</always_on>
+        <update_rate>120</update_rate>
+        <visualize>true</visualize>
+        <topic>camera</topic>
+        
+        <!-- 启用时间戳同步 -->
+        <enable_metrics>true</enable_metrics>
+        
+        <camera>
+          <horizontal_fov>1.4</horizontal_fov>
+          
+          <!-- RGB图像配置 -->
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>RGB_INT8</format>
+          </image>
+          
+          <!-- 深度图像配置 -->
+          <depth>
+            <width>640</width>
+            <height>480</height>
+            <format>R_FLOAT32</format>
+          </depth>
+          
+          <!-- 点云配置 -->
+          <point_cloud>
+            <enable>true</enable>
+          </point_cloud>
+          
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+        </camera>
+      </sensor>
+
+      <!-- IMU传感器 - 与相机同链接确保时间戳同步 -->
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <topic>imu</topic>
+        <enable_metrics>true</enable_metrics>
+        
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0000075</bias_mean>
+                <bias_stddev>0.0000008</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0000075</bias_mean>
+                <bias_stddev>0.0000008</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0000075</bias_mean>
+                <bias_stddev>0.0000008</bias_stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+    </link>
+
+    <!-- 将相机连接到x500的主体上 -->
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+    </joint>
+
+    <!-- 添加雷达传感器链接 - 放在无人机正头顶 -->
+    <link name="lidar_sensor_link">
+      <!-- 放在无人机正头顶，比相机略高 -->
+      <pose>0 0 0.44 0 0 0</pose>  <!-- 无人机正头顶，高度0.44米 -->
+      
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <iyy>0.0001</iyy>
+          <izz>0.0001</izz>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+        </inertia>
+      </inertial>
+      
+      <!-- 雷达可视化 - 更明显的模型 -->
+      <visual name="lidar_visual">
+        <geometry>
+          <cylinder>
+            <radius>0.03</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.8 0.2 0.2 1</ambient>  <!-- 红色 -->
+          <diffuse>0.9 0.3 0.3 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      
+      <!-- 添加第二个视觉元素，使雷达更容易看到 -->
+      <visual name="lidar_top">
+        <pose>0 0 0.025 0 0 0</pose>  <!-- 放在圆柱体顶部 -->
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>0.2 0.8 0.2 1</ambient>  <!-- 绿色 -->
+          <diffuse>0.3 0.9 0.3 1</diffuse>
+        </material>
+      </visual>
+      
+      <collision name="lidar_collision">
+        <geometry>
+          <cylinder>
+            <radius>0.03</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+     <!-- 修改雷达传感器配置 -->
+  <sensor name='lidar' type='gpu_lidar'>
+    <pose>0 0 0 0 0 3.14159</pose>
+    <update_rate>120</update_rate>  <!-- 降低频率以减轻处理负担 -->
+    <topic>lidar</topic>
+    <gz_frame_id>lidar_sensor_link</gz_frame_id>
+    <ray>
+      <scan>
+    <horizontal>
+      <samples>360</samples>      <!-- 每度1个采样点 -->
+      <resolution>1</resolution>
+      <min_angle>-3.14159</min_angle>  <!-- -180° -->
+      <max_angle>3.14159</max_angle>   <!-- +180° -->
+    </horizontal>
+    <vertical>
+      <samples>32</samples>       <!-- 32个垂直激光束 -->
+      <resolution>1</resolution>
+      <min_angle>-0.335</min_angle>    <!-- -19.2° -->
+      <max_angle>0.335</max_angle>     <!-- +19.2° -->
+    </vertical>
+  </scan>
+  <range>
+    <min>0.1</min>
+    <max>50.0</max>
+    <resolution>0.01</resolution>
+  </range>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.01</stddev>
+      </noise>
+    </ray>
+    <always_on>true</always_on>
+    <visualize>true</visualize>
+    <enable_metrics>true</enable_metrics>
+  </sensor>
+    </link>
+
+    <!-- 将雷达连接到x500的主体上 -->
+    <joint name="lidar_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lidar_sensor_link</child>
+    </joint>
+
+  </model>
+</sdf>
